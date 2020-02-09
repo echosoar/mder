@@ -1,3 +1,11 @@
+import {
+  BoldReg,
+  HeadReg,
+  ImgAndLinkReg,
+  ItalicReg,
+  OlReg,
+  UlReg,
+} from './reg';
 export default class Mder {
   private innerSplit: string = ':mder:&:split:';
   private result: any = [];
@@ -28,7 +36,7 @@ export default class Mder {
         continue;
       }
 
-      this.result.push(this.formatGroup(currentLine));
+      this.result.push(this.formatLine(currentLine));
     }
   }
 
@@ -57,7 +65,7 @@ export default class Mder {
         return;
       } else {
         // list
-        if (line.type === 'ol' || line.type === 'ul') {
+        if (line.type === 'ol' || line.type === 'ul') { // ul -> n item -> line or other
           if (pre) {
             if (pre.type === line.type) {
               if (pre.level === line.level) {
@@ -82,12 +90,12 @@ export default class Mder {
     }
   }
 
-  private formatGroup(line: string) {
+  private formatLine(line: string) {
     const tmp = [];
     const newLine = this.formatImgAndLink(line, tmp);
     return {
-      type: 'group',
-      contents: this.splitGroupLine(newLine, tmp),
+      type: 'line',
+      childs: this.splitGroupLine(newLine, tmp),
     };
   }
 
@@ -107,25 +115,38 @@ export default class Mder {
   }
 
   private formatHead(line: string) {
-    const headInfo = /^(#{1,6})\s*(.*?)$/.exec(line);
+    const headInfo = HeadReg.exec(line);
     this.result.push({ type: 'head', level: headInfo[1].length, value: headInfo[2] });
   }
 
   private formatUl(line: string) {
-    const ulInfo = /^(\s*)[-+]\s*(.*)$/.exec(line);
-    this.result.push({ type: 'ul', level: ulInfo[1].length, childs: [this.formatGroup(ulInfo[2])] });
+    const ulInfo = UlReg.exec(line);
+    this.result.push({
+      type: 'ul',
+      level: ulInfo[1].length,
+      childs: [{
+        type: 'item',
+        childs: [this.formatLine(ulInfo[2])],
+      }],
+    });
   }
 
   private formatOl(line: string) {
-    const olInfo = /^(\s*)\d+\.\s*(.*)$/.exec(line);
-    this.result.push({ type: 'ol', level: olInfo[1].length, childs: [this.formatGroup(olInfo[2])] });
+    const olInfo = OlReg.exec(line);
+    this.result.push({
+      type: 'ol',
+      level: olInfo[1].length,
+      childs: [{
+        type: 'item',
+        childs: [this.formatLine(olInfo[2])],
+      }],
+    });
   }
 
   private formatImgAndLink(line: string, contentList) {
-    const imgAndLinkReg = /!\[([^\[\(]*)\]\((.*?)\)|\[([^\[\(]*)\]\((.*?)\)/g;
     let newLine = line;
-    while (imgAndLinkReg.test(newLine)) {
-      newLine = newLine.replace(imgAndLinkReg, (match, imgTitle, imgSrc, linkTitle, linkHref) => {
+    while (ImgAndLinkReg.test(newLine)) {
+      newLine = newLine.replace(ImgAndLinkReg, (match, imgTitle, imgSrc, linkTitle, linkHref) => {
         if (imgTitle || imgSrc) {
           contentList.push({ type: 'img', alt: imgTitle, src: imgSrc });
         } else if (linkTitle || linkHref) {
@@ -139,14 +160,32 @@ export default class Mder {
     return newLine;
   }
 
-  private formatBoldAndItalic(line: string) {
+  private formatBoldAndItalic(line: string, tmp?: any) {
 
     // _123*123_
     // _213*213*123_
     // *13_123*
     // *123_123_123*
-    const tmp = [];
-    // const boldAndItalicReg = /_()_\*\*()\*\*/g;
+    tmp = tmp || [];
+    let newLine = line;
+    while (BoldReg.test(newLine)) {
+      newLine = newLine.replace(BoldReg, (_, boldContent) => {
+        if (!boldContent) {
+          return;
+        }
+        tmp.push({ type: 'bold', childs: this.formatBoldAndItalic(boldContent, tmp) });
+        return  this.innerSplit + (tmp.length - 1) + this.innerSplit;
+      });
+    }
+
+    while (ItalicReg.test(newLine)) {
+      newLine = newLine.replace(ItalicReg, (_, itaOne, itaTwo) => {
+        tmp.push({ type: 'italic', childs: this.formatBoldAndItalic(itaOne || itaTwo, tmp) });
+        return  this.innerSplit + (tmp.length - 1) + this.innerSplit;
+      });
+    }
+
+    // const boldAndItalicReg = /**(.*?)**/g;
     // let newLine = line;
     // while (boldAndItalicReg.test(newLine)) {
     //   newLine = newLine.replace(boldAndItalicReg, (match) => {
@@ -155,7 +194,7 @@ export default class Mder {
     // }
 
     const result = [];
-    line.split(this.innerSplit).forEach((value) => {
+    newLine.split(this.innerSplit).forEach((value) => {
       if (!value) {
         return;
       }

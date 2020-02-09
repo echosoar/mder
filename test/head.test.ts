@@ -22,6 +22,6 @@ describe('Head', () => {
 something # is not head
     `);
     const result = mder.getResult();
-    expect(result[0].type === 'group' && result[1].type === 'group' && result[2].type === 'group').toBeTruthy();
+    expect(result[0].type === 'line' && result[1].type === 'line' && result[2].type === 'line').toBeTruthy();
   });
 });

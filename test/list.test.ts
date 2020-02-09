@@ -19,6 +19,17 @@ describe('List', () => {
    2. level2
     `);
     const result = mder.getResult();
-    expect(result[3].type === 'ul' && result[3].childs[3].childs[0].type === 'ol').toBeTruthy();
+    expect(
+      result[3].type === 'ul' &&
+      result[3].childs[3].type === 'item' &&
+      result[3].childs[3].childs[0].type === 'line' &&
+      result[3].childs[3].childs[0].childs[0].type === 'text' &&
+      result[3].childs[3].childs[0].childs[0].value === 'ul4' &&
+      result[3].childs[3].childs[1].type === 'ol' &&
+      result[3].childs[3].childs[1].childs[0].type === 'item' &&
+      result[3].childs[3].childs[1].childs[0].childs[0].type === 'line' &&
+      result[3].childs[3].childs[1].childs[0].childs[0].childs[0].type === 'text' &&
+      result[3].childs[3].childs[1].childs[0].childs[0].childs[0].value === 'level2',
+    ).toBeTruthy();
   });
 });
