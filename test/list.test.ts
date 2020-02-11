@@ -20,7 +20,7 @@ describe('List', () => {
    2. level2
     `);
     const result = mder.getResult();
-    writeFileSync(resolve(__dirname, './list_mix_ol_and_ul.json'), JSON.stringify(result, null, '  '));
+    writeFileSync(resolve(__dirname, './json/list_mix_ol_and_ul.json'), JSON.stringify(result, null, '  '));
     expect(
       result[3].type === 'ul' &&
       result[3].childs[3].type === 'item' &&

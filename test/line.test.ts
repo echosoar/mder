@@ -9,7 +9,7 @@ describe('Line', () => {
     as[d](link)[![编组.png](imgsrc)](123)[d**asd**](link)**as**_**d**a_sd
     `);
     const result = mder.getResult();
-    writeFileSync(resolve(__dirname, './line.json'), JSON.stringify(result, null, '  '));
+    writeFileSync(resolve(__dirname, './json/line.json'), JSON.stringify(result, null, '  '));
     expect(
       result[0].type === 'line' &&
       result[0].childs[1].type === 'link' &&  // [d](link)
