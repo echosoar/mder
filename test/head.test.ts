@@ -1,5 +1,6 @@
 import Mder from '../src';
-
+import { writeFileSync } from 'fs';
+import { resolve } from 'path';
 describe('Head', () => {
   it('common', () => {
     const mder = new Mder();
@@ -12,6 +13,7 @@ describe('Head', () => {
 ###### h6
     `);
     const result = mder.getResult();
+    writeFileSync(resolve(__dirname, './head_common.json'), JSON.stringify(result, null, '  '));
     expect(result[0].childs[0].childs[0].childs[0].level).toBe(4);
   });
   it('not header', () => {
@@ -22,6 +24,7 @@ describe('Head', () => {
 something # is not head
     `);
     const result = mder.getResult();
+    writeFileSync(resolve(__dirname, './head_not.json'), JSON.stringify(result, null, '  '));
     expect(result[0].type === 'line' && result[1].type === 'line' && result[2].type === 'line').toBeTruthy();
   });
 });
