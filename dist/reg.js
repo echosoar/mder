@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BoldReg = /\*{2}([^\*].*?)\*{2}|\*{4}/g;
+exports.ItalicReg = /_([^_].*?)_|\*([^\*].*?)\*/g;
+exports.ImgAndLinkReg = /!\[([^\[\(]*)\]\((.*?)\)|\[([^\[\(]*)\]\((.*?)\)/g;
+exports.OlReg = /^(\s*)\d+\.\s+(.*)$/;
+exports.UlReg = /^(\s*)[-+]\s+(.*)$/;
+exports.HeadReg = /^(#{1,6})\s+(.*)$/;
+exports.BlockquoteReg = /^(>{1,})\s+(.*)$/;
+exports.CodeReg = /^`{3}(.*)$/;

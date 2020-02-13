@@ -1,93 +1,85 @@
 import {
+  BlockquoteReg,
   BoldReg,
   HeadReg,
   ImgAndLinkReg,
   ItalicReg,
   OlReg,
   UlReg,
+  CodeReg,
 } from './reg';
 export default class Mder {
   private innerSplit: string = ':mder:&:split:';
   private result: any = [];
   public parse(mdContent: string) {
     const allLine = mdContent.split(/\n/);
+    let execInfo = null;
+    let notMatch = false;
     while (allLine.length) {
       const currentLine = allLine.shift();
+      // code
+      execInfo = CodeReg.exec(currentLine);
+      if (execInfo) {
+        if (!notMatch) {
+          notMatch = true;
+          this.insertToResult({ type: 'code', lang: execInfo[1], childs: []});
+        } else {
+          notMatch = false;
+        }
+        continue;
+      }
+
+      if (notMatch) {
+        this.insertNotMatch(currentLine);
+        continue;
+      }
+
       // empty line
       if (/^\s*$/.test(currentLine)) {
-        this.result.push({ type: 'empty' });
+        this.insertToResult({ type: 'empty' });
         continue;
       }
       // head1 to head6
-      if (/^#{1,6}\s/.test(currentLine)) {
-        this.formatHead(currentLine);
+      execInfo = HeadReg.exec(currentLine);
+      if (execInfo) {
+        this.insertToResult({ type: 'head', level: execInfo[1].length, value: execInfo[2] });
         continue;
       }
 
       // ul
-      if (/^\s*[-+]\s/.test(currentLine)) {
-        this.formatUl(currentLine);
+      execInfo = UlReg.exec(currentLine);
+      if (execInfo) {
+        this.formatList('ul', execInfo);
         continue;
       }
 
       // ol
-      if (/^\s*\d+\.\s/.test(currentLine)) {
-        this.formatOl(currentLine);
+      execInfo = OlReg.exec(currentLine);
+      if (execInfo) {
+        this.formatList('ol', execInfo);
         continue;
       }
 
-      this.result.push(this.formatLine(currentLine));
+      // blockquote
+      execInfo = BlockquoteReg.exec(currentLine);
+      if (execInfo) {
+        this.insertToResult({
+          type: 'blockquote',
+          level: execInfo[1].length,
+          childs: [{
+            type: 'item',
+            childs: [this.formatLine(execInfo[2])],
+          }],
+        });
+        continue;
+      }
+
+      this.insertToResult(this.formatLine(currentLine));
     }
   }
 
   public getResult() {
-    const result = [];
-    this.result.forEach((line: any) => {
-      this.format(result, line);
-    });
-    return result;
-  }
-
-  private format(result, line) {
-    const pre = result && result[result.length - 1];
-
-    if (pre && pre.type === 'head') {
-      if (line.type === 'head' && pre.level >= line.level) {
-        result.push(line);
-      } else {
-        if (!pre.childs) {
-          pre.childs = [];
-        }
-        this.format(pre.childs, line);
-      }
-    } else {
-      if (line.type === 'empty' && result.length === 0) {
-        return;
-      } else {
-        // list
-        if (line.type === 'ol' || line.type === 'ul') { // ul -> n item -> line or other
-          if (pre) {
-            if (pre.type === line.type) {
-              if (pre.level === line.level) {
-                this.format(pre.childs, line.childs[0]);
-                return;
-              }
-            }
-            if (pre.type === 'ol' || pre.type === 'ul') {
-              if (pre.level < line.level) {
-                const preLastChild = pre.childs[pre.childs.length - 1];
-                if (!preLastChild.childs) {
-                  preLastChild.childs = [];
-                }
-                this.format(preLastChild.childs, line);
-                return;
-              }
-            }
-          }
-        }
-        result.push(line);
-      }
-    }
+    return this.result;
   }
 
   private formatLine(line: string) {
@@ -114,31 +106,13 @@ export default class Mder {
     return result;
   }
 
-  private formatHead(line: string) {
-    const headInfo = HeadReg.exec(line);
-    this.result.push({ type: 'head', level: headInfo[1].length, value: headInfo[2] });
-  }
-
-  private formatUl(line: string) {
-    const ulInfo = UlReg.exec(line);
-    this.result.push({
-      type: 'ul',
-      level: ulInfo[1].length,
+  private formatList(type, listInfo) {
+    this.insertToResult({
+      type,
+      level: listInfo[1].length,
       childs: [{
         type: 'item',
-        childs: [this.formatLine(ulInfo[2])],
-      }],
-    });
-  }
-
-  private formatOl(line: string) {
-    const olInfo = OlReg.exec(line);
-    this.result.push({
-      type: 'ol',
-      level: olInfo[1].length,
-      childs: [{
-        type: 'item',
-        childs: [this.formatLine(olInfo[2])],
+        childs: [this.formatLine(listInfo[2])],
       }],
     });
   }
@@ -161,11 +135,6 @@ export default class Mder {
   }
 
   private formatBoldAndItalic(line: string, tmp?: any) {
-
-    // _123*123_
-    // _213*213*123_
-    // *13_123*
-    // *123_123_123*
     tmp = tmp || [];
     let newLine = line;
     while (BoldReg.test(newLine)) {
@@ -185,14 +154,6 @@ export default class Mder {
       });
     }
 
-    // const boldAndItalicReg = /**(.*?)**/g;
-    // let newLine = line;
-    // while (boldAndItalicReg.test(newLine)) {
-    //   newLine = newLine.replace(boldAndItalicReg, (match) => {
-    //     return match;
-    //   });
-    // }
-
     const result = [];
     newLine.split(this.innerSplit).forEach((value) => {
       if (!value) {
@@ -205,5 +166,51 @@ export default class Mder {
       }
     });
     return result;
+  }
+
+  private insertToResult(item, result?) {
+    result = result || this.result;
+    const pre = result && result[result.length - 1];
+    if (pre && pre.type === 'head') {
+      if (item.type === 'head' && pre.level >= item.level) {
+        result.push(item);
+      } else {
+        if (!pre.childs) {
+          pre.childs = [];
+        }
+        this.insertToResult(item, pre.childs);
+      }
+    } else {
+      if (item.type === 'empty' && result.length === 0) {
+        return;
+      } else {
+        if (item.level != null) {
+          if (pre) {
+            if (pre.type === item.type) {
+              if (pre.level === item.level) {
+                this.insertToResult(item.childs[0], pre.childs);
+                return;
+              }
+            }
+            if (pre.level != null) {
+              if (pre.level < item.level) {
+                const preLastChild = pre.childs[pre.childs.length - 1];
+                if (!preLastChild.childs) {
+                  preLastChild.childs = [];
+                }
+                this.insertToResult(item, preLastChild.childs);
+                return;
+              }
+            }
+          }
+        }
+        result.push(item);
+      }
+    }
+  }
+
+  private insertNotMatch(currentLine) {
+    const pre = this.result[this.result.length - 1];
+    pre.childs.push({ type: 'line', childs: [{type: 'text', value: currentLine }]});
   }
 }
