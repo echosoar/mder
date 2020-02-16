@@ -9,9 +9,12 @@
         "childs": [
           {
             "type": "text",
-            "value": "全能力支持的markdown解析器，将markdown文本转换为Json对象，可用于后续解析生产为HTML、PDF等内容。"
+            "value": "The full-featured markdown parser, converts Markdown text into JSON objects, which can be used to produce HTML, PDF and other content."
           }
         ]
+      },
+      {
+        "type": "empty"
       },
       {
         "type": "hr"
@@ -19,7 +22,7 @@
       {
         "type": "head",
         "level": 3,
-        "value": "使用方式",
+        "value": "Usage",
         "childs": [
           {
             "type": "code",
@@ -125,7 +128,7 @@
       {
         "type": "head",
         "level": 3,
-        "value": "已支持的Feature",
+        "value": "Feature Supported",
         "childs": [
           {
             "type": "task",
@@ -295,6 +298,40 @@
                     ]
                   }
                 ]
+              }
+            ]
+          },
+          {
+            "type": "empty"
+          }
+        ]
+      },
+      {
+        "type": "head",
+        "level": 3,
+        "value": "Data after this readme parsed",
+        "childs": [
+          {
+            "type": "code",
+            "lang": "JSON",
+            "childs": []
+          },
+          {
+            "type": "empty"
+          }
+        ]
+      },
+      {
+        "type": "head",
+        "level": 3,
+        "value": "License",
+        "childs": [
+          {
+            "type": "line",
+            "childs": [
+              {
+                "type": "text",
+                "value": "MIT"
               }
             ]
           },

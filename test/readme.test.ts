@@ -6,9 +6,11 @@ describe('Readme', () => {
     const mder = new Mder();
     mder.parse(`
 # Mder
-全能力支持的markdown解析器，将markdown文本转换为Json对象，可用于后续解析生产为HTML、PDF等内容。
+
+The full-featured markdown parser, converts Markdown text into JSON objects, which can be used to produce HTML, PDF and other content.
+
 ---
-### 使用方式
+### Usage
 \`\`\`shell
 $ npm i mder --save
 \`\`\`
@@ -24,7 +26,7 @@ const mder = new Mder();
 const result = mder.getResult();
 \`\`\`
 
-### 已支持的Feature
+### Feature Supported
 
 - [x] 一级标题 ~ 六级标题
 - [x] 有序列表
@@ -37,6 +39,13 @@ const result = mder.getResult();
 - [x] 斜体
 - [x] 图片
 - [x] 超链接
+
+### Data after this readme parsed
+\`\`\`JSON
+\`\`\`
+
+### License
+MIT
     `);
     const result = mder.getResult();
     writeFileSync(resolve(__dirname, './json/readme_common.json'), JSON.stringify(result, null, '  '));
