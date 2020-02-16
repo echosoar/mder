@@ -5,12 +5,12 @@ describe('Task', () => {
   it('common', () => {
     const mder = new Mder();
     mder.parse(`
-[ ] task1 not complete
-[  ] task2 not complete
-[x] task3 complete
-[ x] task4 complete
-[x ] task5 complete
-[ x ] task6 complete
+- [ ] task1 not complete
+- [  ] task2 not complete
+- [x] task3 complete
+- [ x] task4 complete
+- [x ] task5 complete
+- [ x ] task6 complete
     `);
     const result = mder.getResult();
     writeFileSync(resolve(__dirname, './json/task_common.json'), JSON.stringify(result, null, '  '));

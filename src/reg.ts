@@ -6,5 +6,5 @@ export const HrReg = /^\s*---\s*$/;
 export const ItalicReg = /_([^_].*?)_|\*([^\*].*?)\*/g;
 export const ImgAndLinkReg = /!\[([^\[\(]*)\]\((.*?)\)|\[([^\[\(]*)\]\((.*?)\)/g;
 export const OlReg = /^(\s*)\d+\.\s+(.*)$/;
-export const TaskReg = /^(\s*)\[(\s+|\s*x\s*)\]\s+(.*)$/;
+export const TaskReg = /^(\s*)-\s+\[(\s+|\s*x\s*)\]\s+(.*)$/;
 export const UlReg = /^(\s*)[-+\*]\s+(.*)$/;

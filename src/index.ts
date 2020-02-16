@@ -55,6 +55,13 @@ export default class Mder {
         continue;
       }
 
+      // task
+      execInfo = TaskReg.exec(currentLine);
+      if (execInfo) {
+        this.formatTask(execInfo);
+        continue;
+      }
+
       // ul
       execInfo = UlReg.exec(currentLine);
       if (execInfo) {
@@ -80,13 +87,6 @@ export default class Mder {
             childs: [this.formatLine(execInfo[2])],
           }],
         });
-        continue;
-      }
-
-      // task
-      execInfo = TaskReg.exec(currentLine);
-      if (execInfo) {
-        this.formatTask(execInfo);
         continue;
       }
 

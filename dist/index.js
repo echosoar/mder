@@ -40,6 +40,11 @@ class Mder {
                 this.insertToResult({ type: 'head', level: execInfo[1].length, value: execInfo[2] });
                 continue;
             }
+            execInfo = reg_1.TaskReg.exec(currentLine);
+            if (execInfo) {
+                this.formatTask(execInfo);
+                continue;
+            }
             execInfo = reg_1.UlReg.exec(currentLine);
             if (execInfo) {
                 this.formatList('ul', execInfo);
@@ -60,11 +65,6 @@ class Mder {
                             childs: [this.formatLine(execInfo[2])],
                         }],
                 });
-                continue;
-            }
-            execInfo = reg_1.TaskReg.exec(currentLine);
-            if (execInfo) {
-                this.formatTask(execInfo);
                 continue;
             }
             this.insertToResult(this.formatLine(currentLine));

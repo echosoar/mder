@@ -26,17 +26,17 @@ const result = mder.getResult();
 
 ### 已支持的Feature
 
-[x] 一级标题 ~ 六级标题
-[x] 有序列表
-[x] 无序列表
-[x] 引用内容
-[x] 代码段
-[x] 分割线
-[x] 任务列表
-[x] 加粗
-[x] 斜体
-[x] 图片
-[x] 超链接
+- [x] 一级标题 ~ 六级标题
+- [x] 有序列表
+- [x] 无序列表
+- [x] 引用内容
+- [x] 代码段
+- [x] 分割线
+- [x] 任务列表
+- [x] 加粗
+- [x] 斜体
+- [x] 图片
+- [x] 超链接
     `);
     const result = mder.getResult();
     writeFileSync(resolve(__dirname, './json/readme_common.json'), JSON.stringify(result, null, '  '));

@@ -8,5 +8,5 @@ exports.HrReg = /^\s*---\s*$/;
 exports.ItalicReg = /_([^_].*?)_|\*([^\*].*?)\*/g;
 exports.ImgAndLinkReg = /!\[([^\[\(]*)\]\((.*?)\)|\[([^\[\(]*)\]\((.*?)\)/g;
 exports.OlReg = /^(\s*)\d+\.\s+(.*)$/;
-exports.TaskReg = /^(\s*)\[(\s+|\s*x\s*)\]\s+(.*)$/;
+exports.TaskReg = /^(\s*)-\s+\[(\s+|\s*x\s*)\]\s+(.*)$/;
 exports.UlReg = /^(\s*)[-+\*]\s+(.*)$/;
