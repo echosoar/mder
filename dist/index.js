@@ -67,12 +67,9 @@ class Mder {
     formatLine(line) {
         const tmp = [];
         const newLine = this.formatImgAndLink(line, tmp);
-        return {
-            type: 'line',
-            childs: this.splitGroupLine(newLine, tmp),
-        };
+        return { type: 'line', childs: this.splitGroupLine(newLine, tmp) };
     }
-    splitGroupLine(line, tmp) {
+    splitGroupLine(line, tmp, onlyText) {
         const result = [];
         line.split(this.innerSplit).forEach((value) => {
             if (!value) {
@@ -80,6 +77,9 @@ class Mder {
             }
             if (/^\d+$/.test(value)) {
                 result.push(tmp[value]);
+            }
+            else if (onlyText) {
+                result.push({ type: 'text', value });
             }
             else {
                 result.push(...this.formatBoldAndItalic(value));
@@ -118,34 +118,23 @@ class Mder {
     formatBoldAndItalic(line, tmp) {
         tmp = tmp || [];
         let newLine = line;
-        while (reg_1.BoldReg.test(newLine)) {
-            newLine = newLine.replace(reg_1.BoldReg, (_, boldContent) => {
-                if (!boldContent) {
-                    return;
-                }
-                tmp.push({ type: 'bold', childs: this.formatBoldAndItalic(boldContent, tmp) });
-                return this.innerSplit + (tmp.length - 1) + this.innerSplit;
-            });
-        }
-        while (reg_1.ItalicReg.test(newLine)) {
-            newLine = newLine.replace(reg_1.ItalicReg, (_, itaOne, itaTwo) => {
-                tmp.push({ type: 'italic', childs: this.formatBoldAndItalic(itaOne || itaTwo, tmp) });
-                return this.innerSplit + (tmp.length - 1) + this.innerSplit;
-            });
-        }
-        const result = [];
-        newLine.split(this.innerSplit).forEach((value) => {
-            if (!value) {
-                return;
-            }
-            if (/^\d+$/.test(value)) {
-                result.push(tmp[value]);
-            }
-            else {
-                result.push({ type: 'text', value });
+        const regList = [
+            { type: 'bold', reg: reg_1.BoldReg, replace: (boldContent) => (boldContent && this.formatBoldAndItalic(boldContent, tmp)) },
+            { type: 'italic', reg: reg_1.ItalicReg, replace: (itaOne, itaTwo) => (this.formatBoldAndItalic(itaOne || itaTwo, tmp)) },
+        ];
+        regList.forEach((regInfo) => {
+            while (regInfo.reg.test(newLine)) {
+                newLine = newLine.replace(regInfo.reg, (_, ...args) => {
+                    const childs = regInfo.replace(...args);
+                    if (!childs) {
+                        return '';
+                    }
+                    tmp.push({ type: regInfo.type, childs });
+                    return this.innerSplit + (tmp.length - 1) + this.innerSplit;
+                });
             }
         });
-        return result;
+        return this.splitGroupLine(newLine, tmp, true);
     }
     insertToResult(item, result) {
         result = result || this.result;
@@ -160,35 +149,32 @@ class Mder {
                 }
                 this.insertToResult(item, pre.childs);
             }
+            return;
         }
-        else {
-            if (item.type === 'empty' && result.length === 0) {
-                return;
-            }
-            else {
-                if (item.level != null) {
-                    if (pre) {
-                        if (pre.type === item.type) {
-                            if (pre.level === item.level) {
-                                this.insertToResult(item.childs[0], pre.childs);
-                                return;
-                            }
-                        }
-                        if (pre.level != null) {
-                            if (pre.level < item.level) {
-                                const preLastChild = pre.childs[pre.childs.length - 1];
-                                if (!preLastChild.childs) {
-                                    preLastChild.childs = [];
-                                }
-                                this.insertToResult(item, preLastChild.childs);
-                                return;
-                            }
-                        }
+        if (item.type === 'empty' && result.length === 0) {
+            return;
+        }
+        if (item.level != null) {
+            if (pre) {
+                if (pre.type === item.type) {
+                    if (pre.level === item.level) {
+                        this.insertToResult(item.childs[0], pre.childs);
+                        return;
                     }
                 }
-                result.push(item);
+                if (pre.level != null) {
+                    if (pre.level < item.level) {
+                        const preLastChild = pre.childs[pre.childs.length - 1];
+                        if (!preLastChild.childs) {
+                            preLastChild.childs = [];
+                        }
+                        this.insertToResult(item, preLastChild.childs);
+                        return;
+                    }
+                }
             }
         }
+        result.push(item);
     }
     insertNotMatch(currentLine) {
         const pre = this.result[this.result.length - 1];

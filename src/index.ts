@@ -85,13 +85,11 @@ export default class Mder {
   private formatLine(line: string) {
     const tmp = [];
     const newLine = this.formatImgAndLink(line, tmp);
-    return {
-      type: 'line',
-      childs: this.splitGroupLine(newLine, tmp),
-    };
+    return { type: 'line', childs: this.splitGroupLine(newLine, tmp) };
   }
 
-  private splitGroupLine(line, tmp) {
+  // 用来处理包含bold、italic等的一行内容
+  private splitGroupLine(line, tmp, onlyText?: boolean) {
     const result = [];
     line.split(this.innerSplit).forEach((value) => {
       if (!value) {
@@ -99,6 +97,8 @@ export default class Mder {
       }
       if (/^\d+$/.test(value)) {
         result.push(tmp[value]);
+      } else if (onlyText) {
+        result.push({ type: 'text', value });
       } else {
         result.push(...this.formatBoldAndItalic(value));
       }
@@ -137,35 +137,23 @@ export default class Mder {
   private formatBoldAndItalic(line: string, tmp?: any) {
     tmp = tmp || [];
     let newLine = line;
-    while (BoldReg.test(newLine)) {
-      newLine = newLine.replace(BoldReg, (_, boldContent) => {
-        if (!boldContent) {
-          return;
-        }
-        tmp.push({ type: 'bold', childs: this.formatBoldAndItalic(boldContent, tmp) });
-        return  this.innerSplit + (tmp.length - 1) + this.innerSplit;
-      });
-    }
-
-    while (ItalicReg.test(newLine)) {
-      newLine = newLine.replace(ItalicReg, (_, itaOne, itaTwo) => {
-        tmp.push({ type: 'italic', childs: this.formatBoldAndItalic(itaOne || itaTwo, tmp) });
-        return  this.innerSplit + (tmp.length - 1) + this.innerSplit;
-      });
-    }
-
-    const result = [];
-    newLine.split(this.innerSplit).forEach((value) => {
-      if (!value) {
-        return;
-      }
-      if (/^\d+$/.test(value)) {
-        result.push(tmp[value]);
-      } else {
-        result.push({ type: 'text', value });
+    const regList = [
+      { type: 'bold', reg: BoldReg, replace: (boldContent) => (boldContent && this.formatBoldAndItalic(boldContent, tmp)) },
+      { type: 'italic', reg: ItalicReg, replace: (itaOne, itaTwo) => (this.formatBoldAndItalic(itaOne || itaTwo, tmp)) },
+    ];
+    regList.forEach((regInfo: any) => {
+      while (regInfo.reg.test(newLine)) {
+        newLine = newLine.replace(regInfo.reg, (_, ...args) => {
+          const childs = (regInfo.replace as any)(...args);
+          if (!childs) {
+            return '';
+          }
+          tmp.push({ type: regInfo.type, childs });
+          return  this.innerSplit + (tmp.length - 1) + this.innerSplit;
+        });
       }
     });
-    return result;
+    return this.splitGroupLine(newLine, tmp, true);
   }
 
   private insertToResult(item, result?) {
@@ -180,33 +168,33 @@ export default class Mder {
         }
         this.insertToResult(item, pre.childs);
       }
-    } else {
-      if (item.type === 'empty' && result.length === 0) {
-        return;
-      } else {
-        if (item.level != null) {
-          if (pre) {
-            if (pre.type === item.type) {
-              if (pre.level === item.level) {
-                this.insertToResult(item.childs[0], pre.childs);
-                return;
-              }
-            }
-            if (pre.level != null) {
-              if (pre.level < item.level) {
-                const preLastChild = pre.childs[pre.childs.length - 1];
-                if (!preLastChild.childs) {
-                  preLastChild.childs = [];
-                }
-                this.insertToResult(item, preLastChild.childs);
-                return;
-              }
-            }
+      return;
+    }
+    if (item.type === 'empty' && result.length === 0) {
+      return;
+    }
+
+    if (item.level != null) {
+      if (pre) {
+        if (pre.type === item.type) {
+          if (pre.level === item.level) {
+            this.insertToResult(item.childs[0], pre.childs);
+            return;
           }
         }
-        result.push(item);
+        if (pre.level != null) {
+          if (pre.level < item.level) {
+            const preLastChild = pre.childs[pre.childs.length - 1];
+            if (!preLastChild.childs) {
+              preLastChild.childs = [];
+            }
+            this.insertToResult(item, preLastChild.childs);
+            return;
+          }
+        }
       }
     }
+    result.push(item);
   }
 
   private insertNotMatch(currentLine) {
