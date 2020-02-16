@@ -5,30 +5,34 @@ class Mder {
     constructor() {
         this.innerSplit = ':mder:&:split:';
         this.result = [];
+        this.notMatch = false;
     }
     parse(mdContent) {
         const allLine = mdContent.split(/\n/);
         let execInfo = null;
-        let notMatch = false;
         while (allLine.length) {
             const currentLine = allLine.shift();
             execInfo = reg_1.CodeReg.exec(currentLine);
             if (execInfo) {
-                if (!notMatch) {
-                    notMatch = true;
+                if (!this.notMatch) {
+                    this.notMatch = true;
                     this.insertToResult({ type: 'code', lang: execInfo[1], childs: [] });
                 }
                 else {
-                    notMatch = false;
+                    this.notMatch = false;
                 }
                 continue;
             }
-            if (notMatch) {
+            if (this.notMatch) {
                 this.insertNotMatch(currentLine);
                 continue;
             }
             if (/^\s*$/.test(currentLine)) {
                 this.insertToResult({ type: 'empty' });
+                continue;
+            }
+            if (reg_1.HrReg.test(currentLine)) {
+                this.insertToResult({ type: 'hr' });
                 continue;
             }
             execInfo = reg_1.HeadReg.exec(currentLine);
@@ -56,6 +60,11 @@ class Mder {
                             childs: [this.formatLine(execInfo[2])],
                         }],
                 });
+                continue;
+            }
+            execInfo = reg_1.TaskReg.exec(currentLine);
+            if (execInfo) {
+                this.formatTask(execInfo);
                 continue;
             }
             this.insertToResult(this.formatLine(currentLine));
@@ -94,6 +103,17 @@ class Mder {
             childs: [{
                     type: 'item',
                     childs: [this.formatLine(listInfo[2])],
+                }],
+        });
+    }
+    formatTask(taskInfo) {
+        this.insertToResult({
+            type: 'task',
+            level: taskInfo[1].length,
+            childs: [{
+                    type: 'item',
+                    complete: !!(taskInfo[2] || '').replace(/\s/g, ''),
+                    childs: [this.formatLine(taskInfo[3])],
                 }],
         });
     }
@@ -151,6 +171,10 @@ class Mder {
             }
             return;
         }
+        if (pre && pre.type === 'code' && this.notMatch) {
+            this.insertToResult(item, pre.childs);
+            return;
+        }
         if (item.type === 'empty' && result.length === 0) {
             return;
         }
@@ -177,8 +201,7 @@ class Mder {
         result.push(item);
     }
     insertNotMatch(currentLine) {
-        const pre = this.result[this.result.length - 1];
-        pre.childs.push({ type: 'line', childs: [{ type: 'text', value: currentLine }] });
+        this.insertToResult({ type: 'line', childs: [{ type: 'text', value: currentLine }] }, this.result);
     }
 }
 exports.default = Mder;

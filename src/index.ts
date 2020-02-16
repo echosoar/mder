@@ -1,35 +1,37 @@
 import {
   BlockquoteReg,
   BoldReg,
+  CodeReg,
   HeadReg,
+  HrReg,
   ImgAndLinkReg,
   ItalicReg,
   OlReg,
+  TaskReg,
   UlReg,
-  CodeReg,
 } from './reg';
 export default class Mder {
   private innerSplit: string = ':mder:&:split:';
   private result: any = [];
+  private notMatch: boolean = false;
   public parse(mdContent: string) {
     const allLine = mdContent.split(/\n/);
     let execInfo = null;
-    let notMatch = false;
     while (allLine.length) {
       const currentLine = allLine.shift();
       // code
       execInfo = CodeReg.exec(currentLine);
       if (execInfo) {
-        if (!notMatch) {
-          notMatch = true;
+        if (!this.notMatch) {
+          this.notMatch = true;
           this.insertToResult({ type: 'code', lang: execInfo[1], childs: []});
         } else {
-          notMatch = false;
+          this.notMatch = false;
         }
         continue;
       }
 
-      if (notMatch) {
+      if (this.notMatch) {
         this.insertNotMatch(currentLine);
         continue;
       }
@@ -39,6 +41,13 @@ export default class Mder {
         this.insertToResult({ type: 'empty' });
         continue;
       }
+
+      // hr
+      if (HrReg.test(currentLine)) {
+        this.insertToResult({ type: 'hr' });
+        continue;
+      }
+
       // head1 to head6
       execInfo = HeadReg.exec(currentLine);
       if (execInfo) {
@@ -71,6 +80,13 @@ export default class Mder {
             childs: [this.formatLine(execInfo[2])],
           }],
         });
+        continue;
+      }
+
+      // task
+      execInfo = TaskReg.exec(currentLine);
+      if (execInfo) {
+        this.formatTask(execInfo);
         continue;
       }
 
@@ -113,6 +129,18 @@ export default class Mder {
       childs: [{
         type: 'item',
         childs: [this.formatLine(listInfo[2])],
+      }],
+    });
+  }
+
+  private formatTask(taskInfo) {
+    this.insertToResult({
+      type: 'task',
+      level: taskInfo[1].length,
+      childs: [{
+        type: 'item',
+        complete: !!(taskInfo[2] || '').replace(/\s/g, ''),
+        childs: [this.formatLine(taskInfo[3])],
       }],
     });
   }
@@ -170,6 +198,10 @@ export default class Mder {
       }
       return;
     }
+    if (pre && pre.type === 'code' && this.notMatch) {
+      this.insertToResult(item, pre.childs);
+      return;
+    }
     if (item.type === 'empty' && result.length === 0) {
       return;
     }
@@ -198,7 +230,6 @@ export default class Mder {
   }
 
   private insertNotMatch(currentLine) {
-    const pre = this.result[this.result.length - 1];
-    pre.childs.push({ type: 'line', childs: [{type: 'text', value: currentLine }]});
+    this.insertToResult({ type: 'line', childs: [{type: 'text', value: currentLine }]}, this.result);
   }
 }
