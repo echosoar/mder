@@ -1,10 +1,10 @@
-import Mder from '../src';
+import Mdps from '../src';
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 describe('List', () => {
   it('ol mix ul', () => {
-    const mder = new Mder();
-    mder.parse(`
+    const mdps = new Mdps();
+    mdps.parse(`
 1. line1
 2. line2
 3. line3
@@ -19,7 +19,7 @@ describe('List', () => {
    1. level2
    2. level2
     `);
-    const result = mder.getResult();
+    const result = mdps.getResult();
     writeFileSync(resolve(__dirname, './json/list_mix_ol_and_ul.json'), JSON.stringify(result, null, '  '));
     expect(
       result[3].type === 'ul' &&

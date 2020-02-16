@@ -1,16 +1,16 @@
-import Mder from '../src';
+import Mdps from '../src';
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 describe('Hr', () => {
   it('common', () => {
-    const mder = new Mder();
-    mder.parse(`
+    const mdps = new Mdps();
+    mdps.parse(`
 ---
     ---
   not ---
 not ---
     `);
-    const result = mder.getResult();
+    const result = mdps.getResult();
     writeFileSync(resolve(__dirname, './json/hr_common.json'), JSON.stringify(result, null, '  '));
     expect(
       result[0].type === 'hr' &&

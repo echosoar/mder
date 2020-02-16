@@ -1,15 +1,15 @@
-import Mder from '../src';
+import Mdps from '../src';
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 describe('Blockquote', () => {
   it('common', () => {
-    const mder = new Mder();
-    mder.parse(`
+    const mdps = new Mdps();
+    mdps.parse(`
 > bq1
 > bq2
 > bq3
     `);
-    const result = mder.getResult();
+    const result = mdps.getResult();
     writeFileSync(resolve(__dirname, './json/blockquote_common.json'), JSON.stringify(result, null, '  '));
     expect(
       result[0].type === 'blockquote' &&
@@ -29,14 +29,14 @@ describe('Blockquote', () => {
   });
 
   it('multi level', () => {
-    const mder = new Mder();
-    mder.parse(`
+    const mdps = new Mdps();
+    mdps.parse(`
 > bq1
 >> bq2
 >>> bq3
 > bq1-item2
     `);
-    const result = mder.getResult();
+    const result = mdps.getResult();
     writeFileSync(resolve(__dirname, './json/blockquote_multi_level.json'), JSON.stringify(result, null, '  '));
     expect(
       result[0].type === 'blockquote' &&

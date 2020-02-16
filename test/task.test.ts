@@ -1,10 +1,10 @@
-import Mder from '../src';
+import Mdps from '../src';
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 describe('Task', () => {
   it('common', () => {
-    const mder = new Mder();
-    mder.parse(`
+    const mdps = new Mdps();
+    mdps.parse(`
 - [ ] task1 not complete
 - [  ] task2 not complete
 - [x] task3 complete
@@ -12,7 +12,7 @@ describe('Task', () => {
 - [x ] task5 complete
 - [ x ] task6 complete
     `);
-    const result = mder.getResult();
+    const result = mdps.getResult();
     writeFileSync(resolve(__dirname, './json/task_common.json'), JSON.stringify(result, null, '  '));
     expect(
       result[0].type === 'task' &&

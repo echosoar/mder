@@ -1,22 +1,23 @@
-# Mder
+# Mdps
+[![npm](https://img.shields.io/npm/v/mdps.svg?style=flat)](https://www.npmjs.org/package/mdps) [![travis](https://travis-ci.org/echosoar/mdps.svg?branch=master)](https://travis-ci.org/echosoar/mdps)
 
 The full-featured markdown parser, converts Markdown text into JSON objects, which can be used to produce HTML, PDF and other content.
 
 ---
 ### Usage
 ```shell
-$ npm i mder --save
+$ npm i mdps --save
 ```
 
 ```javascript
-const Mder = require('mder');
-const mder = new Mder();
-    mder.parse(`
+const Mdps = require('mdps');
+const mdps = new Mdps();
+    mdps.parse(`
 # h1
 [ ] tesk not complete
 [x] tesk complete
 `);
-const result = mder.getResult();
+const result = mdps.getResult();
 ```
 
 ### Feature Supported

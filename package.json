@@ -1,7 +1,7 @@
 {
-  "name": "mder",
+  "name": "mdps",
   "version": "0.0.1",
-  "description": "mder",
+  "description": "mdps",
   "main": "./dist/index.js",
   "scripts": {
     "dev": "tsc --watch",

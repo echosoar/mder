@@ -1,14 +1,14 @@
-import Mder from '../src';
+import Mdps from '../src';
 import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 
 describe('Line', () => {
   it('mix text link bold itelic and img', () => {
-    const mder = new Mder();
-    mder.parse(`
+    const mdps = new Mdps();
+    mdps.parse(`
     as[d](link)[![编组.png](imgsrc)](123)[d**asd**](link)**as**_**d**a_sd
     `);
-    const result = mder.getResult();
+    const result = mdps.getResult();
     writeFileSync(resolve(__dirname, './json/line.json'), JSON.stringify(result, null, '  '));
     expect(
       result[0].type === 'line' &&

@@ -10,8 +10,8 @@ import {
   TaskReg,
   UlReg,
 } from './reg';
-export default class Mder {
-  private innerSplit: string = ':mder:&:split:';
+export default class Mdps {
+  private innerSplit: string = ':mdps:&:split:';
   private result: any = [];
   private notMatch: boolean = false;
   public parse(mdContent: string) {
