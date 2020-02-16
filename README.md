@@ -40,8 +40,42 @@ const result = mdps.getResult();
   {
     "type": "head",
     "level": 1,
-    "value": "Mder",
+    "value": "Mdps",
     "childs": [
+      {
+        "type": "line",
+        "childs": [
+          {
+            "type": "link",
+            "childs": [
+              {
+                "type": "img",
+                "alt": "npm",
+                "src": "https://img.shields.io/npm/v/mdps.svg?style=flat"
+              }
+            ],
+            "href": "https://www.npmjs.org/package/mdps"
+          },
+          {
+            "type": "text",
+            "value": " "
+          },
+          {
+            "type": "link",
+            "childs": [
+              {
+                "type": "img",
+                "alt": "travis",
+                "src": "https://travis-ci.org/echosoar/mdps.svg?branch=master"
+              }
+            ],
+            "href": "https://travis-ci.org/echosoar/mdps"
+          }
+        ]
+      },
+      {
+        "type": "empty"
+      },
       {
         "type": "line",
         "childs": [
@@ -71,7 +105,7 @@ const result = mdps.getResult();
                 "childs": [
                   {
                     "type": "text",
-                    "value": "$ npm i mder --save"
+                    "value": "$ npm i mdps --save"
                   }
                 ]
               }
@@ -89,7 +123,7 @@ const result = mdps.getResult();
                 "childs": [
                   {
                     "type": "text",
-                    "value": "const Mder = require('mder');"
+                    "value": "const Mdps = require('mdps');"
                   }
                 ]
               },
@@ -98,7 +132,7 @@ const result = mdps.getResult();
                 "childs": [
                   {
                     "type": "text",
-                    "value": "const mder = new Mder();"
+                    "value": "const mdps = new Mdps();"
                   }
                 ]
               },
@@ -107,7 +141,7 @@ const result = mdps.getResult();
                 "childs": [
                   {
                     "type": "text",
-                    "value": "    mder.parse(`"
+                    "value": "    mdps.parse(`"
                   }
                 ]
               },
@@ -152,7 +186,7 @@ const result = mdps.getResult();
                 "childs": [
                   {
                     "type": "text",
-                    "value": "const result = mder.getResult();"
+                    "value": "const result = mdps.getResult();"
                   }
                 ]
               }
@@ -352,7 +386,17 @@ const result = mdps.getResult();
           {
             "type": "code",
             "lang": "JSON",
-            "childs": []
+            "childs": [
+              {
+                "type": "line",
+                "childs": [
+                  {
+                    "type": "text",
+                    "value": ""
+                  }
+                ]
+              }
+            ]
           },
           {
             "type": "empty"
