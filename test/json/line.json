@@ -76,6 +76,15 @@
       {
         "type": "text",
         "value": "sd"
+      },
+      {
+        "type": "delete",
+        "childs": [
+          {
+            "type": "text",
+            "value": "ha"
+          }
+        ]
       }
     ]
   },

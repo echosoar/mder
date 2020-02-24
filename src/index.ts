@@ -9,6 +9,7 @@ import {
   OlReg,
   TaskReg,
   UlReg,
+  DelReg,
 } from './reg';
 export default class Mdps {
   private innerSplit: string = ':mdps:&:split:';
@@ -168,6 +169,7 @@ export default class Mdps {
     const regList = [
       { type: 'bold', reg: BoldReg, replace: (boldContent) => (boldContent && this.formatBoldAndItalic(boldContent, tmp)) },
       { type: 'italic', reg: ItalicReg, replace: (itaOne, itaTwo) => (this.formatBoldAndItalic(itaOne || itaTwo, tmp)) },
+      { type: 'delete', reg: DelReg, replace: (delContent) => (delContent && this.formatBoldAndItalic(delContent, tmp)) },
     ];
     regList.forEach((regInfo: any) => {
       while (regInfo.reg.test(newLine)) {
