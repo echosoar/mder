@@ -8,4 +8,4 @@ export const ImgAndLinkReg = /!\[([^\[\(]*)\]\((.*?)\)|\[([^\[\(]*)\]\((.*?)\)/g
 export const OlReg = /^(\s*)\d+\.\s+(.*)$/;
 export const TaskReg = /^(\s*)-\s+\[(\s+|\s*x\s*)\]\s+(.*)$/;
 export const UlReg = /^(\s*)[-+\*]\s+(.*)$/;
-export const DelReg = /~~([^_].*?)~~/g;
+export const DelReg = /~~([^~].*?)~~/g;
